@@ -1,0 +1,11 @@
+{
+    "presets": ["latest", "react", "stage-3"],
+    "plugins": [
+        "react-hot-loader/babel",
+        "transform-es2015-destructuring",
+        "transform-object-rest-spread",
+        "transform-decorators-legacy",
+        "transform-class-properties",
+        "transform-runtime"
+    ]
+}

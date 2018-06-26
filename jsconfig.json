@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "lib": ["es2017"],
+        "target": "es2017",
+        "module": "commonjs",
+        "allowSyntheticDefaultImports": true,
+        "experimentalDecorators": true,
+        "jsx": "react",
+        "baseUrl": "./src/",
+        "paths": {
+            "components/*": ["components/*"],
+            "common/*": ["components/common/*"],
+            "data/*": ["data/*"],
+            "store/*": ["data/store/**/*"],
+            "helpers/*": ["data/helpers/**/*"],
+            "services/*": ["services/**/*"]
+        }
+    },
+    "exclude": ["node_modules", "dist"],
+    "include": ["src/**/*"]
+}
