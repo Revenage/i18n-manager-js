@@ -23,7 +23,7 @@ module.exports = {
                 include: path.join(__dirname, 'src'),
             },
             {
-                test: /\.s?[ac]ss$/,
+                test: /\.(s?[ac]ss)$/,
                 use: [
                     MiniCssExtractPlugin.loader,
                     'css-loader?sourceMap',
@@ -61,5 +61,11 @@ module.exports = {
         contentBase: [path.resolve(__dirname, 'dist')],
         historyApiFallback: true,
         useLocalIp: true,
+    },
+    resolve: {
+        alias: {
+            pages: path.resolve(__dirname, 'src/pages'),
+        },
+        extensions: ['.js', '.jsx'],
     },
 };
