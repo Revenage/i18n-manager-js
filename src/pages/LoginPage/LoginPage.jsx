@@ -62,7 +62,7 @@ function LoginPage(params) {
                         >
                             Sign in
                         </button>
-                        <small class="text-muted">
+                        <small className="text-muted">
                             Haven't account? <Link to="/signup">Sign up</Link>
                         </small>
                         <p className="mt-5 mb-3 text-muted text-center">

@@ -12,7 +12,7 @@ function Root() {
                 <Route path="/login" component={LoginPage} />
                 {/* <Route path="/logout" component={LogoutPage} />*/}
                 <Route path="/signup" component={SignUpPage} />
-                {/* <Route path="/" component={Dashboard} /> */}
+                <Route path="/" render={() => <div>TEST</div>} />
             </Switch>
         </BrowserRouter>
     );

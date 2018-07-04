@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-function SignUpPage(params) {
+function LoginPage(params) {
     return (
         <div className="container-fluid">
             <div className="row">
@@ -30,18 +30,6 @@ function SignUpPage(params) {
 
                         <div className="form-label-group">
                             <input
-                                type="text"
-                                id="inputName"
-                                className="form-control"
-                                placeholder="Name"
-                                required=""
-                                autoFocus=""
-                            />
-                            <label htmlFor="inputName">Name</label>
-                        </div>
-
-                        <div className="form-label-group">
-                            <input
                                 type="email"
                                 id="inputEmail"
                                 className="form-control"
@@ -62,15 +50,20 @@ function SignUpPage(params) {
                             />
                             <label htmlFor="inputPassword">Password</label>
                         </div>
-                        <button
+                        <div className="checkbox mb-3">
+                            <label>
+                                <input type="checkbox" value="remember-me" />{' '}
+                                Remember me
+                            </label>
+                        </div>
+                        <input
                             className="btn btn-lg btn-primary btn-block"
                             type="submit"
                         >
-                            Sign Up
-                        </button>
+                            Sign in
+                        </input>
                         <small className="text-muted">
-                            Already have account?{' '}
-                            <Link to="/login">Sign in</Link>
+                            Haven't account? <Link to="/signup">Sign up</Link>
                         </small>
                         <p className="mt-5 mb-3 text-muted text-center">
                             © 2017-2018
@@ -82,4 +75,4 @@ function SignUpPage(params) {
     );
 }
 
-export default SignUpPage;
+export default LoginPage;
