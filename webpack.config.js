@@ -23,12 +23,8 @@ module.exports = {
                 include: path.join(__dirname, 'src'),
             },
             {
-                test: /\.(s?[ac]ss)$/,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    'css-loader?sourceMap',
-                    'sass-loader?sourceMap',
-                ],
+                test: /\.(scss|sass|css)$/i,
+                use: [MiniCssExtractPlugin.loader, 'css-loader'],
             },
             {
                 test: /\.(eot?.+|svg?.+|ttf?.+|otf?.+|woff?.+|woff2?.+)$/,
@@ -43,6 +39,10 @@ module.exports = {
         ],
     },
     plugins: [
+        new MiniCssExtractPlugin({
+            filename: '[name].css',
+            chunkFilename: '[id].css',
+        }),
         new CopyWebpackPlugin([
             {
                 from: path.resolve(__dirname, 'assets'),
@@ -65,6 +65,7 @@ module.exports = {
     resolve: {
         alias: {
             pages: path.resolve(__dirname, 'src/pages'),
+            components: path.resolve(__dirname, 'src/components'),
         },
         extensions: ['.js', '.jsx'],
     },
