@@ -10,55 +10,91 @@ const config = {
     username: {
         placeholder: 'Username',
         type: 'text',
-        required: true,
+        required: {
+            regExp: '[a-zA-Z0-9_]{3,}$',
+            wrong: 'Login length must be at least 3',
+        },
         validFeedback: 'Looks good!',
         invalidFeedback: 'Invalid username',
     },
     email: {
         placeholder: 'Email address',
         type: 'email',
-        required: true,
+        required: {
+            regExp: '^[A-Z0-9._%+-]+@[A-Z0-9.-]+.[A-Z]{2,4}$',
+            wrong: 'Invalid email address',
+        },
         validFeedback: 'Looks good!',
         invalidFeedback: 'Invalid email address',
     },
     password: {
         placeholder: 'Password',
         type: 'password',
-        required: true,
+        required: {
+            regExp: '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})',
+            wrong:
+                'Password length must be at least 8. Password must contain at least 1 upper letter, 1 lower letter and 1 digit',
+        },
         validFeedback: 'Looks good!',
         invalidFeedback: 'Invalid password',
     },
 };
 
-function FieldsList({ values, errors, touched, handleChange, handleBlur }) {
-    return Object.keys(config).map(field => {
+Object.defineProperty(config, 'keys', {
+    get: function() {
+        return Object.keys(config);
+    },
+    enumerable: false,
+});
+
+Object.defineProperty(config, 'initial', {
+    get: function() {
+        return Object.keys(config).reduce((acc, current) => {
+            acc[current] = '';
+            return acc;
+        }, {});
+    },
+    enumerable: false,
+});
+
+function FieldsList({
+    config,
+    values,
+    errors,
+    touched,
+    handleChange,
+    handleBlur,
+}) {
+    return config.keys.map(field => {
         const { type, placeholder, required, validFeedback } = config[field];
         const id = `input${field}`;
+        const isTouched = touched[field];
+        const error = errors[field];
         return (
             <div className="form-label-group" key={field}>
                 <input
                     type={type}
                     name={field}
                     onChange={handleChange}
-                    onBlur={handleBlur}
+                    onBlur={e => handleBlur(e)}
                     value={values[field]}
                     id={id}
                     className={cn('form-control', {
-                        'is-invalid': touched[field] && errors[field],
-                        'is-valid': touched[field] && !errors[field],
+                        'is-invalid': isTouched && error,
+                        'is-valid': isTouched && !error,
                     })}
                     placeholder={placeholder}
                     required={required}
                 />
                 <label htmlFor={id}>{placeholder}</label>
-                {touched[field] && (
+                {isTouched && (
                     <small
                         className={cn('form-text', {
-                            'invalid-feedback': errors[field],
-                            'valid-feedback': !errors[field],
+                            'invalid-feedback': error,
+                            'valid-feedback': !error,
                         })}
                     >
-                        {errors[field] ? errors[field] : validFeedback}
+                        {error || validFeedback}
                     </small>
                 )}
             </div>
@@ -67,8 +103,6 @@ function FieldsList({ values, errors, touched, handleChange, handleBlur }) {
 }
 
 function LoginPage({ handleSubmit, isSubmitting, ...formikProps }) {
-    console.log(isSubmitting);
-
     return (
         <Form>
             <form
@@ -96,7 +130,7 @@ function LoginPage({ handleSubmit, isSubmitting, ...formikProps }) {
                         </a>
                     </p>
                 </div>
-                <FieldsList {...formikProps} />
+                <FieldsList config={config} {...formikProps} />
                 <button
                     className="btn btn-lg btn-primary btn-block"
                     type="submit"
@@ -114,40 +148,21 @@ function LoginPage({ handleSubmit, isSubmitting, ...formikProps }) {
 
 export default withFormik({
     // Transform outer props into form values
-    mapPropsToValues: props => ({ email: '', password: '', username: '' }),
+    mapPropsToValues: props => config.initial,
     // Add a custom validation function (this can be async too!)
     validate: (values, props) => {
-        const errors = {};
-
-        if (!values.username) {
-            errors.username = 'Field required';
-        } else if (!/[a-zA-Z0-9_]{3,}$/i.test(values.username)) {
-            errors.username = 'Login length must be at least 3';
-        }
-
-        if (!values.email) {
-            errors.email = 'Field required';
-        } else if (
-            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
-        ) {
-            errors.email = 'Invalid email address';
-        }
-        if (!values.password) {
-            errors.password = 'Field required';
-        } else if (
-            !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/i.test(
-                values.password,
-            )
-        ) {
-            errors.password =
-                'Password length must be at least 8. Password must contain at least 1 upper letter, 1 lower letter and 1 digit';
-        }
-
-        return errors;
+        return config.keys.reduce((acc, current) => {
+            const { regExp, wrong } = config[current].required;
+            if (!values[current]) {
+                acc[current] = 'Field required';
+            } else if (!new RegExp(regExp, 'i').test(values[current])) {
+                acc[current] = wrong;
+            }
+            return acc;
+        }, {});
     },
     // Submission handler
     handleSubmit: (values, { props, setSubmitting, setErrors }) => {
-        console.log('send login');
         unsecureInstance
             .post('/login/', values)
             .then(({ data }) => {
@@ -156,23 +171,11 @@ export default withFormik({
                 setSubmitting(false);
             })
             .catch((err, a, b) => {
-                setErrors({
-                    email: 'bad',
-                    password: 'bad',
-                    username: 'bad',
-                });
+                const errors = Object.keys(values).reduce((acc, current) => {
+                    acc[current] = 'bad';
+                    return acc;
+                }, {});
+                setErrors(errors);
             });
-        // LoginToMyApp(values).then(
-        //     user => {
-        //         setSubmitting(false);
-        //         // do whatevs...
-        //         // props.updateUser(user)
-        //     },
-        //     errors => {
-        //         setSubmitting(false);
-        //         // Maybe even transform your API's errors into the same shape as Formik's!
-        //         setErrors(transformMyApiErrors(errors));
-        //     },
-        // );
     },
 })(LoginPage);
