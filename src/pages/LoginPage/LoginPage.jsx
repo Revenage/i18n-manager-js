@@ -1,10 +1,8 @@
 import React from 'react';
 import { withFormik } from 'formik';
-import { Link } from 'react-router-dom';
-import Form from 'components/Form';
+import { Link, withRouter } from 'react-router-dom';
+import Form, { FieldsList, formikConfig } from 'components/Form';
 import { unsecureInstance } from 'api';
-import { isEmpty } from 'lodash-es';
-import cn from 'classnames';
 
 const config = {
     username: {
@@ -31,7 +29,7 @@ const config = {
         placeholder: 'Password',
         type: 'password',
         required: {
-            regExp: '^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})',
+            regExp: '^(?=.*[a-z])(?=.*[0-9])(?=.{8,})', //'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})',
             wrong:
                 'Password length must be at least 8. Password must contain at least 1 upper letter, 1 lower letter and 1 digit',
         },
@@ -39,68 +37,6 @@ const config = {
         invalidFeedback: 'Invalid password',
     },
 };
-
-Object.defineProperty(config, 'keys', {
-    get: function() {
-        return Object.keys(config);
-    },
-    enumerable: false,
-});
-
-Object.defineProperty(config, 'initial', {
-    get: function() {
-        return Object.keys(config).reduce((acc, current) => {
-            acc[current] = '';
-            return acc;
-        }, {});
-    },
-    enumerable: false,
-});
-
-function FieldsList({
-    config,
-    values,
-    errors,
-    touched,
-    handleChange,
-    handleBlur,
-}) {
-    return config.keys.map(field => {
-        const { type, placeholder, required, validFeedback } = config[field];
-        const id = `input${field}`;
-        const isTouched = touched[field];
-        const error = errors[field];
-        return (
-            <div className="form-label-group" key={field}>
-                <input
-                    type={type}
-                    name={field}
-                    onChange={handleChange}
-                    onBlur={e => handleBlur(e)}
-                    value={values[field]}
-                    id={id}
-                    className={cn('form-control', {
-                        'is-invalid': isTouched && error,
-                        'is-valid': isTouched && !error,
-                    })}
-                    placeholder={placeholder}
-                    required={required}
-                />
-                <label htmlFor={id}>{placeholder}</label>
-                {isTouched && (
-                    <small
-                        className={cn('form-text', {
-                            'invalid-feedback': error,
-                            'valid-feedback': !error,
-                        })}
-                    >
-                        {error || validFeedback}
-                    </small>
-                )}
-            </div>
-        );
-    });
-}
 
 function LoginPage({ handleSubmit, isSubmitting, ...formikProps }) {
     return (
@@ -146,36 +82,33 @@ function LoginPage({ handleSubmit, isSubmitting, ...formikProps }) {
     );
 }
 
-export default withFormik({
-    // Transform outer props into form values
-    mapPropsToValues: props => config.initial,
-    // Add a custom validation function (this can be async too!)
-    validate: (values, props) => {
-        return config.keys.reduce((acc, current) => {
-            const { regExp, wrong } = config[current].required;
-            if (!values[current]) {
-                acc[current] = 'Field required';
-            } else if (!new RegExp(regExp, 'i').test(values[current])) {
-                acc[current] = wrong;
-            }
-            return acc;
-        }, {});
-    },
-    // Submission handler
-    handleSubmit: (values, { props, setSubmitting, setErrors }) => {
-        unsecureInstance
-            .post('/login/', values)
-            .then(({ data }) => {
-                const { key } = data;
-                localStorage.setItem('token', key);
-                setSubmitting(false);
-            })
-            .catch((err, a, b) => {
-                const errors = Object.keys(values).reduce((acc, current) => {
-                    acc[current] = 'bad';
-                    return acc;
-                }, {});
-                setErrors(errors);
-            });
-    },
-})(LoginPage);
+export default withRouter(
+    withFormik({
+        // Transform outer props into form values
+        ...formikConfig(config),
+        // Submission handler
+        handleSubmit: (
+            values,
+            { props: { history }, setSubmitting, setErrors },
+        ) => {
+            unsecureInstance
+                .post('/rest-auth/login/', values)
+                .then(({ data }) => {
+                    const { key } = data;
+                    localStorage.setItem('token', key);
+                    setSubmitting(false);
+                    history.push('/');
+                })
+                .catch(err => {
+                    const errors = Object.keys(values).reduce(
+                        (acc, current) => {
+                            acc[current] = 'bad';
+                            return acc;
+                        },
+                        {},
+                    );
+                    setErrors(errors);
+                });
+        },
+    })(LoginPage),
+);
