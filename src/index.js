@@ -8,6 +8,11 @@ import SignUpPage from 'pages/SignUpPage';
 import DocumentsPage from 'pages/DocumentsPage';
 import store from 'store';
 
+function logout() {
+    localStorage.removeItem('token');
+    return <Redirect to="/login" />;
+}
+
 function isAuthorized() {
     return localStorage.getItem('token');
 }
@@ -22,6 +27,7 @@ function Root() {
             <BrowserRouter>
                 <Switch>
                     <Route path="/login" component={LoginPage} />
+                    <Route path="/logout" component={logout} />
                     <PrivateRoute path="/documents" component={DocumentsPage} />
                     <PrivateRoute path="/signup" component={SignUpPage} />
                     <PrivateRoute path="/" component={DocumentsPage} />
