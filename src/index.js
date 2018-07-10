@@ -6,6 +6,7 @@ import { render } from 'react-dom';
 import LoginPage from 'pages/LoginPage';
 import SignUpPage from 'pages/SignUpPage';
 import DocumentsPage from 'pages/DocumentsPage';
+import DocumentPage from 'pages/DocumentPage';
 import store from 'store';
 
 function logout() {
@@ -28,6 +29,10 @@ function Root() {
                 <Switch>
                     <Route path="/login" component={LoginPage} />
                     <Route path="/logout" component={logout} />
+                    <PrivateRoute
+                        path="/documents/edit/:id"
+                        component={DocumentPage}
+                    />
                     <PrivateRoute path="/documents" component={DocumentsPage} />
                     <PrivateRoute path="/signup" component={SignUpPage} />
                     <PrivateRoute path="/" component={DocumentsPage} />

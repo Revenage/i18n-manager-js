@@ -38,14 +38,39 @@ async function getDocuments() {
         const { data } = await instance.get('/documents/', {
             headers: {
                 Authorization: 'Token ' + localStorage.getItem('token'),
-                // 'Access-Control-Allow-Origin': '*',
             },
         });
         return data;
     } catch (e) {
-        console.error(e); // 💩
+        console.error(e);
     }
 }
 
-export { unsecureInstance, getDocuments };
+async function getDocument(id) {
+    try {
+        const { data } = await instance.get(`/documents/${id}`, {
+            headers: {
+                Authorization: 'Token ' + localStorage.getItem('token'),
+            },
+        });
+        return data;
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+async function getUser() {
+    try {
+        const { data } = await instance.get('/rest-auth/user/', {
+            headers: {
+                Authorization: 'Token ' + localStorage.getItem('token'),
+            },
+        });
+        return data;
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+export { unsecureInstance, getDocuments, getUser, getDocument };
 export default instance;

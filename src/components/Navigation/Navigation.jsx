@@ -1,7 +1,12 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { observer, inject } from 'mobx-react';
 
-function Navigation() {
+function Navigation({
+    store: {
+        user: { username },
+    },
+}) {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark fixed-top bg-dark shadow">
             <a className="navbar-brand col-sm-3 col-md-2 mr-0" href="#">
@@ -41,7 +46,7 @@ function Navigation() {
                         aria-haspopup="true"
                         aria-expanded="false"
                     >
-                        Username
+                        {username || 'Username'}
                     </a>
                     <div className="dropdown-menu" aria-labelledby="dropdown07">
                         <a className="dropdown-item" href="#">
@@ -72,4 +77,4 @@ function Navigation() {
     );
 }
 
-export default Navigation;
+export default inject('store')(observer(Navigation));
