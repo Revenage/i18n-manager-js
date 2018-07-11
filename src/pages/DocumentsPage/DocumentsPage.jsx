@@ -11,7 +11,7 @@ function dateToYMD(date) {
     return '' + (d <= 9 ? '0' + d : d) + '/' + (m <= 9 ? '0' + m : m) + '/' + y;
 }
 
-function Card({ id, name, created_date, published_date, remove }) {
+function Card({ id, name, created_date, published_date, remove, description }) {
     const date = new Date(created_date);
     const upDate = published_date && new Date(published_date);
     return (
@@ -25,17 +25,19 @@ function Card({ id, name, created_date, published_date, remove }) {
                             Last update: {dateToYMD(upDate)}
                         </span>
                     )}
-                    <p className="card-text">
-                        With supporting text below as a natural lead-in to
-                        additional content.
-                    </p>
+                    <p className="card-text">{description}</p>
                     <NavLink
                         to={`/documents/edit/${id}/`}
                         className="btn btn-primary"
                     >
                         Edit
                     </NavLink>
-                    <button onClick={e => remove(id)}>Remove</button>
+                    <button
+                        className="btn btn-danger"
+                        onClick={e => remove(id)}
+                    >
+                        Remove
+                    </button>
                 </div>
             </div>
         </div>
@@ -46,7 +48,9 @@ function Add({ onClick }) {
     return (
         <div className="col-md-3" onClick={e => onClick()}>
             <div className="card text-center">
-                <div className="card-body">ADD NEW</div>
+                <div className="card-body">
+                    <button className="btn btn-success">ADD NEW</button>
+                </div>
             </div>
         </div>
     );
@@ -74,7 +78,7 @@ class DocumentsPage extends Component {
     render() {
         const { documents, removeDocument, createDocument } = this.props.store;
 
-        const model = getTable(documents);
+        const model = getTable([...documents, { id: 'add' }]);
 
         return (
             <Fragment>
@@ -86,16 +90,25 @@ class DocumentsPage extends Component {
                                 key={i}
                                 className="row align-items-center mt-3"
                             >
-                                {row.map(item => (
-                                    <Card
-                                        {...item}
-                                        key={item.id}
-                                        remove={id => removeDocument(id)}
-                                    />
-                                ))}
+                                {row.map(item => {
+                                    if (item.id === 'add') {
+                                        return (
+                                            <Add
+                                                key={item.id}
+                                                onClick={e => createDocument()}
+                                            />
+                                        );
+                                    }
+                                    return (
+                                        <Card
+                                            {...item}
+                                            key={item.id}
+                                            remove={id => removeDocument(id)}
+                                        />
+                                    );
+                                })}
                             </div>
                         ))}
-                        <Add onClick={e => createDocument()} />
                     </div>
                 </Layout>
             </Fragment>

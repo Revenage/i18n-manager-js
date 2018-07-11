@@ -3,7 +3,7 @@ import { types, flow } from 'mobx-state-tree';
 import {
     getDocuments,
     getUser,
-    getDocumentm,
+    getDocument,
     removeDocumentById,
     createDocumentItem,
 } from 'api';
