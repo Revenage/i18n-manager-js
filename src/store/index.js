@@ -1,6 +1,12 @@
 // create an instance from a snapshot
 import { types, flow } from 'mobx-state-tree';
-import { getDocuments, getUser, getDocument } from 'api';
+import {
+    getDocuments,
+    getUser,
+    getDocumentm,
+    removeDocumentById,
+    createDocumentItem,
+} from 'api';
 import Document from './Document';
 import User from './User';
 
@@ -17,15 +23,18 @@ const Store = types
             const { data, ...newData } = props; // data: null
             if (index !== -1) {
                 const document = self.documents[index];
-                self.documents[index] = { ...document, newData };
+                self.documents[index] = document;
             } else {
                 self.documents.push(newData);
             }
         },
         fetchUser: flow(function* fetchUser() {
-            self.user = {};
+            // self.user = {};
             try {
-                self.user = yield getUser();
+                const user = yield getUser();
+                if (user) {
+                    self.user = user;
+                }
             } catch (error) {
                 console.error('Failed to fetch user', error);
             }
@@ -49,14 +58,38 @@ const Store = types
                 console.error('Failed to fetch documents', error);
             }
         }),
+        removeDocument: flow(function* removeDocument(id) {
+            try {
+                yield removeDocumentById(id);
+                const document = self.getDocumentByID(id);
+                self.documents.remove(document);
+            } catch (error) {
+                console.error('Failed to remove document', error);
+            }
+        }),
+        createDocument: flow(function* createDocument(id) {
+            try {
+                const document = yield createDocumentItem({});
+                self.documents.push(document);
+            } catch (error) {
+                console.error('Failed to remove document', error);
+            }
+        }),
         afterCreate() {
-            self.fetchUser();
+            if (localStorage.getItem('token')) {
+                self.fetchUser();
+            }
+        },
+    }))
+    .views(self => ({
+        getDocumentByID(documentId) {
+            return self.documents.find(({ id }) => id === +documentId) || null;
         },
     }));
 
 const store = Store.create({
     user: {
-        username: '',
+        username: null,
     },
     documents: [],
     documentsStatus: 'pending',

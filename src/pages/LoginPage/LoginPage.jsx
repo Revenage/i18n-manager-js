@@ -3,6 +3,7 @@ import { withFormik } from 'formik';
 import { Link, withRouter } from 'react-router-dom';
 import Form, { FieldsList, formikConfig } from 'components/Form';
 import { unsecureInstance } from 'api';
+import { inject } from 'mobx-react';
 
 const config = {
     username: {
@@ -41,12 +42,7 @@ const config = {
 function LoginPage({ handleSubmit, isSubmitting, ...formikProps }) {
     return (
         <Form>
-            <form
-                className="form-signin"
-                onSubmit={handleSubmit}
-                noValidate
-                autoComplete="off"
-            >
+            <form className="form-signin" onSubmit={handleSubmit} noValidate>
                 <div className="text-center mb-4">
                     <img
                         className="mb-4"
@@ -83,32 +79,36 @@ function LoginPage({ handleSubmit, isSubmitting, ...formikProps }) {
 }
 
 export default withRouter(
-    withFormik({
-        // Transform outer props into form values
-        ...formikConfig(config),
-        // Submission handler
-        handleSubmit: (
-            values,
-            { props: { history }, setSubmitting, setErrors },
-        ) => {
-            unsecureInstance
-                .post('/rest-auth/login/', values)
-                .then(({ data }) => {
-                    const { key } = data;
-                    localStorage.setItem('token', key);
-                    setSubmitting(false);
-                    history.push('/');
-                })
-                .catch(err => {
-                    const errors = Object.keys(values).reduce(
-                        (acc, current) => {
-                            acc[current] = 'bad';
-                            return acc;
-                        },
-                        {},
-                    );
-                    setErrors(errors);
-                });
-        },
-    })(LoginPage),
+    inject('store')(
+        withFormik({
+            // Transform outer props into form values
+            ...formikConfig(config),
+            // Submission handler
+            handleSubmit: (
+                values,
+                { props: { history, store }, setSubmitting, setErrors },
+            ) => {
+                // TODO: move to store method
+                unsecureInstance
+                    .post('/rest-auth/login/', values)
+                    .then(({ data }) => {
+                        const { key } = data;
+                        localStorage.setItem('token', key);
+                        store.fetchUser();
+                        setSubmitting(false);
+                        history.push('/');
+                    })
+                    .catch(err => {
+                        const errors = Object.keys(values).reduce(
+                            (acc, current) => {
+                                acc[current] = 'bad';
+                                return acc;
+                            },
+                            {},
+                        );
+                        setErrors(errors);
+                    });
+            },
+        })(LoginPage),
+    ),
 );

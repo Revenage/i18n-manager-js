@@ -34,7 +34,7 @@ function Root() {
                         component={DocumentPage}
                     />
                     <PrivateRoute path="/documents" component={DocumentsPage} />
-                    <PrivateRoute path="/signup" component={SignUpPage} />
+                    <Route path="/signup" component={SignUpPage} />
                     <PrivateRoute path="/" component={DocumentsPage} />
                 </Switch>
             </BrowserRouter>

@@ -20,19 +20,40 @@ class DocumentPage extends Component {
 
     render() {
         const {
-            store: { documents },
+            store: { getDocumentByID, documents },
             match: {
-                params: { id: _id },
+                params: { id },
             },
+            history: { goBack },
         } = this.props;
-        // const name = documents.find(({ id }) => id === _id);
-        // console.log(documents);
+        const document = getDocumentByID(id);
+
+        // const {
+        //     created_date,
+        //     description,
+        //     id,
+        //     name,
+        //     owner,
+        //     published_date,
+        // } = document;
 
         return (
             <Fragment>
                 <Navigation />
                 <Layout>
+                    <button onClick={e => goBack()}>Back</button>
                     <div className="container">Edit page {name}</div>
+                    {document ? (
+                        <div>
+                            {Object.keys(document).map(key => (
+                                <div key={key}>{`${key} : ${
+                                    document[key]
+                                }`}</div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div>NO DATA</div>
+                    )}
                 </Layout>
             </Fragment>
         );

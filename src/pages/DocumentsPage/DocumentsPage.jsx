@@ -11,14 +11,20 @@ function dateToYMD(date) {
     return '' + (d <= 9 ? '0' + d : d) + '/' + (m <= 9 ? '0' + m : m) + '/' + y;
 }
 
-function Card({ id, name, created_date }) {
+function Card({ id, name, created_date, published_date, remove }) {
     const date = new Date(created_date);
+    const upDate = published_date && new Date(published_date);
     return (
         <div className="col-md-3">
             <div className="card text-center">
                 <div className="card-body">
                     <h5 className="card-title">{name || 'No Name'}</h5>
                     <h6 className="card-title">Created: {dateToYMD(date)}</h6>
+                    {upDate && (
+                        <span className="card-title">
+                            Last update: {dateToYMD(upDate)}
+                        </span>
+                    )}
                     <p className="card-text">
                         With supporting text below as a natural lead-in to
                         additional content.
@@ -29,7 +35,18 @@ function Card({ id, name, created_date }) {
                     >
                         Edit
                     </NavLink>
+                    <button onClick={e => remove(id)}>Remove</button>
                 </div>
+            </div>
+        </div>
+    );
+}
+
+function Add({ onClick }) {
+    return (
+        <div className="col-md-3" onClick={e => onClick()}>
+            <div className="card text-center">
+                <div className="card-body">ADD NEW</div>
             </div>
         </div>
     );
@@ -55,7 +72,7 @@ class DocumentsPage extends Component {
     }
 
     render() {
-        const { documents } = this.props.store;
+        const { documents, removeDocument, createDocument } = this.props.store;
 
         const model = getTable(documents);
 
@@ -70,10 +87,15 @@ class DocumentsPage extends Component {
                                 className="row align-items-center mt-3"
                             >
                                 {row.map(item => (
-                                    <Card {...item} key={item.id} />
+                                    <Card
+                                        {...item}
+                                        key={item.id}
+                                        remove={id => removeDocument(id)}
+                                    />
                                 ))}
                             </div>
                         ))}
+                        <Add onClick={e => createDocument()} />
                     </div>
                 </Layout>
             </Fragment>

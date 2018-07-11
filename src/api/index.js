@@ -59,6 +59,33 @@ async function getDocument(id) {
     }
 }
 
+async function removeDocumentById(id) {
+    try {
+        const { data } = await instance.delete(`/documents/${id}`, {
+            headers: {
+                Authorization: 'Token ' + localStorage.getItem('token'),
+            },
+        });
+        return data;
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+async function createDocumentItem(document = {}) {
+    try {
+        const { data } = await instance.post('/documents/', {
+            params: document,
+            headers: {
+                Authorization: 'Token ' + localStorage.getItem('token'),
+            },
+        });
+        return data;
+    } catch (e) {
+        console.error(e);
+    }
+}
+
 async function getUser() {
     try {
         const { data } = await instance.get('/rest-auth/user/', {
@@ -72,5 +99,12 @@ async function getUser() {
     }
 }
 
-export { unsecureInstance, getDocuments, getUser, getDocument };
+export {
+    unsecureInstance,
+    getDocuments,
+    getUser,
+    getDocument,
+    removeDocumentById,
+    createDocumentItem,
+};
 export default instance;
