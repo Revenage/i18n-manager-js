@@ -41,7 +41,12 @@ function Card({ id, name, created_date, description, published_date, remove }) {
                     >
                         Edit
                     </NavLink>
-                    <button onClick={e => remove(id)}>Remove</button>
+                    <button
+                        className="btn btn-danger"
+                        onClick={e => remove(id)}
+                    >
+                        Remove
+                    </button>
                 </div>
             </div>
         </div>

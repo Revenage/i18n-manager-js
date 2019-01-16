@@ -7,6 +7,24 @@ import Layout from 'components/Layout';
 @inject('store')
 @observer
 class DocumentPage extends Component {
+    state = {
+        data: {
+            en: {
+                translations: {
+                    TEST: 'test',
+                    WATCHNOW: 'Watch now',
+                    'HISTORY.PREV': 'history of previous meetings',
+                },
+            },
+            ru: {
+                translations: {},
+            },
+            uk: {
+                translations: {},
+            },
+        },
+    };
+
     componentDidMount() {
         const {
             store: { fetchDocument },
@@ -36,6 +54,12 @@ class DocumentPage extends Component {
         //     owner,
         //     published_date,
         // } = document;
+        const { data } = this.state;
+
+        const mainLang = 'en';
+        const langs = Object.keys(data);
+        const rows = data[mainLang].translations;
+        const rowsKeys = Object.keys(rows);
 
         return (
             <Fragment>
@@ -54,6 +78,29 @@ class DocumentPage extends Component {
                     ) : (
                         <div>NO DATA</div>
                     )}
+
+                    <table style={{ width: '100%' }}>
+                        <thead>
+                            <tr>
+                                <th>KEY</th>
+                                {langs.map(lang => <th key={lang}>{lang}</th>)}
+                                <th />
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {rowsKeys.map(key => (
+                                <tr key={key}>
+                                    <td>{key}</td>
+                                    {langs.map(lang => (
+                                        <td key={lang}>
+                                            {data[lang].translations[key]}
+                                        </td>
+                                    ))}
+                                    <td>X</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </Layout>
             </Fragment>
         );

@@ -4,6 +4,10 @@ import {
     getDocuments,
     getDocument,
     getUser,
+<<<<<<< HEAD
+=======
+    getDocument,
+>>>>>>> c42cbb0e69b779bfc7aca96fb8984eed5eb5b3c7
     removeDocumentById,
     createDocumentItem,
 } from 'api';
