@@ -75,7 +75,7 @@ async function removeDocumentById(id) {
 async function createDocumentItem(document = {}) {
     try {
         const { data } = await instance.post('/documents/', {
-            params: document,
+            ...document,
             headers: {
                 Authorization: 'Token ' + localStorage.getItem('token'),
             },

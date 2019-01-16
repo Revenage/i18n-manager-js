@@ -11,24 +11,30 @@ function dateToYMD(date) {
     return '' + (d <= 9 ? '0' + d : d) + '/' + (m <= 9 ? '0' + m : m) + '/' + y;
 }
 
-function Card({ id, name, created_date, published_date, remove }) {
+function Card({ id, name, created_date, description, published_date, remove }) {
     const date = new Date(created_date);
     const upDate = published_date && new Date(published_date);
     return (
         <div className="col-md-3">
             <div className="card text-center">
                 <div className="card-body">
-                    <h5 className="card-title">{name || 'No Name'}</h5>
-                    <h6 className="card-title">Created: {dateToYMD(date)}</h6>
+                    {name && <h5 className="card-title">{name}</h5>}
+                    {date && (
+                        <h6 className="card-title">
+                            Created: {dateToYMD(date)}
+                        </h6>
+                    )}
                     {upDate && (
                         <span className="card-title">
                             Last update: {dateToYMD(upDate)}
                         </span>
                     )}
-                    <p className="card-text">
-                        With supporting text below as a natural lead-in to
-                        additional content.
-                    </p>
+                    {description && (
+                        <p className="card-text">
+                            With supporting text below as a natural lead-in to
+                            additional content.
+                        </p>
+                    )}
                     <NavLink
                         to={`/documents/edit/${id}/`}
                         className="btn btn-primary"
@@ -44,9 +50,13 @@ function Card({ id, name, created_date, published_date, remove }) {
 
 function Add({ onClick }) {
     return (
-        <div className="col-md-3" onClick={e => onClick()}>
+        <div className="col-md-3" onClick={e => onClick(e)}>
             <div className="card text-center">
-                <div className="card-body">ADD NEW</div>
+                <div className="card-body">
+                    <button type="button" className="btn btn-default btn-lg">
+                        <i className="far fa-plus-square fa-10x" />
+                    </button>
+                </div>
             </div>
         </div>
     );
@@ -73,7 +83,6 @@ class DocumentsPage extends Component {
 
     render() {
         const { documents, removeDocument, createDocument } = this.props.store;
-
         const model = getTable(documents);
 
         return (
@@ -81,21 +90,24 @@ class DocumentsPage extends Component {
                 <Navigation />
                 <Layout>
                     <div className="container">
-                        {model.map((row, i) => (
-                            <div
-                                key={i}
-                                className="row align-items-center mt-3"
-                            >
-                                {row.map(item => (
-                                    <Card
-                                        {...item}
-                                        key={item.id}
-                                        remove={id => removeDocument(id)}
-                                    />
-                                ))}
-                            </div>
-                        ))}
-                        <Add onClick={e => createDocument()} />
+                        {Boolean(model.length) ? (
+                            model.map((row, i) => (
+                                <div key={i} className="row mt-3">
+                                    {row.map(item => (
+                                        <Card
+                                            {...item}
+                                            key={item.id}
+                                            remove={id => removeDocument(id)}
+                                        />
+                                    ))}
+                                    {i + 1 === model.length && (
+                                        <Add onClick={e => createDocument()} />
+                                    )}
+                                </div>
+                            ))
+                        ) : (
+                            <Add onClick={e => createDocument()} />
+                        )}
                     </div>
                 </Layout>
             </Fragment>

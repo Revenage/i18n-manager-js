@@ -2,13 +2,15 @@
 import { types, flow } from 'mobx-state-tree';
 import {
     getDocuments,
+    getDocument,
     getUser,
-    getDocumentm,
     removeDocumentById,
     createDocumentItem,
 } from 'api';
 import Document from './Document';
 import User from './User';
+
+const emptytext = 'Empty document ';
 
 // create an instance from a snapshot
 const Store = types
@@ -67,9 +69,17 @@ const Store = types
                 console.error('Failed to remove document', error);
             }
         }),
-        createDocument: flow(function* createDocument(id) {
+        createDocument: flow(function* createDocument({
+            name,
+            description,
+        } = {}) {
             try {
-                const document = yield createDocumentItem({});
+                const { length } = self.documents;
+                // const lastNum = self.documents.filter(({name}) => name.includes(emptytext)).reduce((acc, {name}) => {name}, 0);
+                const document = yield createDocumentItem({
+                    name: name || `${emptytext}${length ? length + 1 : ''}`,
+                    description: description || 'please fill the document',
+                });
                 self.documents.push(document);
             } catch (error) {
                 console.error('Failed to remove document', error);
