@@ -59,6 +59,20 @@ async function getDocument(id) {
     }
 }
 
+async function updateDocument(id, params) {
+    try {
+        const { data } = await instance.put(`/documents/${id}`, {
+            headers: {
+                Authorization: 'Token ' + localStorage.getItem('token'),
+            },
+            params,
+        });
+        return data;
+    } catch (e) {
+        console.error(e);
+    }
+}
+
 async function removeDocumentById(id) {
     try {
         const { data } = await instance.delete(`/documents/${id}`, {
@@ -99,12 +113,22 @@ async function getUser() {
     }
 }
 
+async function logout() {
+    try {
+        await unsecureInstance.post('/rest-auth/logout/');
+    } catch (e) {
+        console.error(e);
+    }
+}
+
 export {
     unsecureInstance,
     getDocuments,
     getUser,
     getDocument,
+    updateDocument,
     removeDocumentById,
     createDocumentItem,
+    logout,
 };
 export default instance;

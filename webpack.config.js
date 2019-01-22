@@ -1,8 +1,10 @@
+const env = process.env.NODE_ENV || 'production';
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const webpack = require('webpack');
 
 module.exports = {
     entry: {
@@ -13,6 +15,16 @@ module.exports = {
         // filename: 'assets/js/[name].[chunkhash].js',
         filename: 'static/js/[name].js',
         publicPath: '/',
+    },
+    devtool: 'source-map',
+    devServer: {
+        contentBase: [path.resolve(__dirname, 'dist')],
+        historyApiFallback: true,
+        historyApiFallback: {
+            disableDotRule: true,
+        },
+        host: '0.0.0.0',
+        useLocalIp: true,
     },
     module: {
         rules: [
@@ -39,6 +51,9 @@ module.exports = {
         ],
     },
     plugins: [
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': JSON.stringify(env),
+        }),
         new MiniCssExtractPlugin({
             filename: '[name].css',
             chunkFilename: '[id].css',
@@ -56,18 +71,14 @@ module.exports = {
         }),
         new CleanWebpackPlugin(['dist']),
     ],
-    devtool: 'source-map',
-    devServer: {
-        contentBase: [path.resolve(__dirname, 'dist')],
-        historyApiFallback: true,
-        useLocalIp: true,
-    },
     resolve: {
         alias: {
             pages: path.resolve(__dirname, 'src/pages'),
             components: path.resolve(__dirname, 'src/components'),
             api: path.resolve(__dirname, 'src/api'),
             store: path.resolve(__dirname, 'src/store'),
+            config: path.resolve(__dirname, 'src/config'),
+            constants: path.resolve(__dirname, 'src/constants'),
         },
         extensions: ['.js', '.jsx'],
     },

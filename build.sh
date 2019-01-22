@@ -1,1 +1,0 @@
-cp -r ./dist/ ../i18n-manager//web/templates/web/

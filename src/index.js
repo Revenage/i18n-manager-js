@@ -7,12 +7,13 @@ import LoginPage from 'pages/LoginPage';
 import SignUpPage from 'pages/SignUpPage';
 import DocumentsPage from 'pages/DocumentsPage';
 import DocumentPage from 'pages/DocumentPage';
+import Layout from 'components/Layout';
 import store from 'store';
 
-function logout() {
-    localStorage.removeItem('token');
-    return <Redirect to="/login" />;
-}
+// function logout() {
+//     localStorage.removeItem('token');
+//     return <Redirect to="/login" />;
+// }
 
 function isAuthorized() {
     return localStorage.getItem('token');
@@ -26,17 +27,22 @@ function Root() {
     return (
         <Provider store={store}>
             <BrowserRouter>
-                <Switch>
-                    <Route path="/login" component={LoginPage} />
-                    <Route path="/logout" component={logout} />
-                    <PrivateRoute
-                        path="/documents/edit/:id"
-                        component={DocumentPage}
-                    />
-                    <PrivateRoute path="/documents" component={DocumentsPage} />
-                    <Route path="/signup" component={SignUpPage} />
-                    <PrivateRoute path="/" component={DocumentsPage} />
-                </Switch>
+                <Layout>
+                    <Switch>
+                        <Route path="/login" component={LoginPage} />
+                        {/* <Route   path="/logout" component={logout} /> */}
+                        <PrivateRoute
+                            path="/documents/edit/:id"
+                            component={DocumentPage}
+                        />
+                        <PrivateRoute
+                            path="/documents"
+                            component={DocumentsPage}
+                        />
+                        <Route path="/signup" component={SignUpPage} />
+                        <PrivateRoute path="/" component={DocumentsPage} />
+                    </Switch>
+                </Layout>
             </BrowserRouter>
         </Provider>
     );

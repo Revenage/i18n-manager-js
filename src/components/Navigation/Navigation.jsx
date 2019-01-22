@@ -1,17 +1,24 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
+import { NavLink } from 'react-router-dom';
 
 function Navigation({
     store: {
         user: { username },
+        logout,
     },
 }) {
+    console.log(username);
+
     return (
         <nav className="navbar navbar-expand-lg navbar-dark fixed-top bg-dark shadow">
-            <a className="navbar-brand col-sm-3 col-md-2 mr-0" href="#">
+            <NavLink
+                to="/"
+                className="navbar-brand col-sm-3 col-md-2 mr-0"
+                href="#"
+            >
                 I18n-manager
-            </a>
+            </NavLink>
 
             <div
                 className="collapse navbar-collapse"
@@ -40,7 +47,6 @@ function Navigation({
                 <li className="nav-item dropdown">
                     <a
                         className="nav-link dropdown-toggle"
-                        href="https://example.com"
                         id="dropdown07"
                         data-toggle="dropdown"
                         aria-haspopup="true"
@@ -52,13 +58,16 @@ function Navigation({
                         <a className="dropdown-item" href="#">
                             Settings
                         </a>
-                        <NavLink
+                        {/* <NavLink
                             to="/logout"
                             className="dropdown-item"
                             href="#"
                         >
                             Sign out
-                        </NavLink>
+                        </NavLink> */}
+                        <button className="dropdown-item" onClick={logout}>
+                            Logout
+                        </button>
                     </div>
                 </li>
             </ul>

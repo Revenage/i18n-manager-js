@@ -1,8 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { NavLink } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
-import Navigation from 'components/Navigation';
-import Layout from 'components/Layout';
+import { values } from 'mobx';
 
 function dateToYMD(date) {
     var d = date.getDate();
@@ -67,9 +66,10 @@ function Add({ onClick }) {
     );
 }
 
-function getTable(items) {
+function getTable(documents) {
+    const items = values(documents);
     const itemPerRow = 4;
-    const len = items.length;
+    const len = items.length + 1;
     const rowsLength =
         Math.floor(len / itemPerRow) + (len % itemPerRow > 0 ? 1 : 0);
     return Array.apply(null, Array(rowsLength)).map((val, index) => {
@@ -89,32 +89,31 @@ class DocumentsPage extends Component {
     render() {
         const { documents, removeDocument, createDocument } = this.props.store;
         const model = getTable(documents);
-
         return (
             <Fragment>
-                <Navigation />
-                <Layout>
-                    <div className="container">
-                        {Boolean(model.length) ? (
-                            model.map((row, i) => (
-                                <div key={i} className="row mt-3">
-                                    {row.map(item => (
-                                        <Card
-                                            {...item}
-                                            key={item.id}
-                                            remove={id => removeDocument(id)}
-                                        />
-                                    ))}
-                                    {i + 1 === model.length && (
-                                        <Add onClick={e => createDocument()} />
-                                    )}
-                                </div>
-                            ))
-                        ) : (
-                            <Add onClick={e => createDocument()} />
-                        )}
-                    </div>
-                </Layout>
+                <div className="container">
+                    {Boolean(model.length) ? (
+                        model.map((row, i) => (
+                            <div key={i} className="row mt-3">
+                                {row.map(item => (
+                                    <Card
+                                        {...item}
+                                        key={item.id}
+                                        remove={id => removeDocument(id)}
+                                    />
+                                ))}
+                                {i + 1 === model.length && (
+                                    <Add
+                                        key="addbtn"
+                                        onClick={e => createDocument()}
+                                    />
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        <Add onClick={e => createDocument()} />
+                    )}
+                </div>
             </Fragment>
         );
     }

@@ -1,10 +1,10 @@
-import { types } from 'mobx-state-tree';
+import { observable } from 'mobx';
 
-export default types.model({
-    // pk: types.number,
-    username: types.maybe(types.string),
-    // owner: types.number,
-    // created_date: types.maybe(types.string),
-    // published_date: types.maybe(types.string),
-    // data: types.maybe(types.strin),
-});
+class User {
+    constructor(props) {
+        Object.assign(this, props);
+    }
+    @observable username;
+}
+
+export default User;
