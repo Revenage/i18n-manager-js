@@ -65,7 +65,7 @@ async function updateDocument(id, params) {
             headers: {
                 Authorization: 'Token ' + localStorage.getItem('token'),
             },
-            params,
+            ...params,
         });
         return data;
     } catch (e) {

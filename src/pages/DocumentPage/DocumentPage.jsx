@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from 'react';
-import { NavLink } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
 import { keys } from 'mobx';
 
@@ -9,21 +8,6 @@ class DocumentPage extends Component {
     state = {
         openNewRow: false,
         openNewLang: false,
-        // data: {
-        //     en: {
-        //         translations: {
-        //             TEST: 'test',
-        //             WATCHNOW: 'Watch now',
-        //             'HISTORY.PREV': 'history of previous meetings',
-        //         },
-        //     },
-        //     ru: {
-        //         translations: {},
-        //     },
-        //     uk: {
-        //         translations: {},
-        //     },
-        // },
     };
 
     componentDidMount() {
@@ -37,15 +21,67 @@ class DocumentPage extends Component {
         fetchDocument(id);
     }
 
-    addLang() {
-        const { value } = this.newLang;
+    async addLang(e) {
+        const { value } = e.target;
         const {
-            store: { updateDocument },
+            store: { addLanguage },
             match: {
                 params: { id },
             },
         } = this.props;
-        updateDocument(id, { [value]: {} });
+        if (value.length) {
+            await addLanguage(id, value);
+        }
+
+        this.setState({ openNewLang: false });
+    }
+
+    async removeLang(lang) {
+        const {
+            store: { removeLanguage },
+            match: {
+                params: { id },
+            },
+        } = this.props;
+        await removeLanguage(id, lang);
+    }
+
+    async addKey(e) {
+        const { value } = e.target;
+        const {
+            store: { addKey },
+            match: {
+                params: { id },
+            },
+        } = this.props;
+        if (value.length) {
+            await addKey(id, value);
+        }
+
+        this.setState({ openNewRow: false });
+    }
+
+    async removeKey(key) {
+        const {
+            store: { removeKey },
+            match: {
+                params: { id },
+            },
+        } = this.props;
+        await removeKey(id, key);
+    }
+
+    async addValue(e, lang, key) {
+        const { value } = e.target;
+        const {
+            store: { addValue },
+            match: {
+                params: { id },
+            },
+        } = this.props;
+        if (value.length) {
+            await addValue(id, lang, key, value);
+        }
     }
 
     render() {
@@ -103,16 +139,28 @@ class DocumentPage extends Component {
                             {langs.map(lang => (
                                 <th scope="col" key={lang}>
                                     {lang}
+                                    <button
+                                        onClick={e => this.removeLang(lang)}
+                                    >
+                                        -
+                                    </button>
                                 </th>
                             ))}
-                            {openNewLang && (
+                            {openNewLang ? (
                                 <th scope="col">
                                     <input
-                                        onBlur={e => this.addLang()}
+                                        onBlur={e => this.addLang(e)}
                                         type="text"
                                         placeholder="Type lang"
-                                        ref={ref => (this.newLang = ref)}
                                     />
+                                </th>
+                            ) : (
+                                <th
+                                    onClick={e =>
+                                        this.setState({ openNewLang: true })
+                                    }
+                                >
+                                    +
                                 </th>
                             )}
                         </tr>
@@ -123,22 +171,42 @@ class DocumentPage extends Component {
                                 <tr key={key}>
                                     <th scope="row">
                                         <span>{key} </span>
-                                        <button>X</button>
+                                        <button
+                                            onClick={e => this.removeKey(key)}
+                                        >
+                                            X
+                                        </button>
                                     </th>
                                     {langs.map(lang => (
                                         <td key={lang}>
-                                            {data[lang][key]
-                                                ? data[lang][key]
-                                                : '---'}
+                                            {data[lang][key] ? (
+                                                data[lang][key]
+                                            ) : (
+                                                <input
+                                                    type="text"
+                                                    placeholder="Type value"
+                                                    onBlur={e =>
+                                                        this.addValue(
+                                                            e,
+                                                            lang,
+                                                            key,
+                                                        )
+                                                    }
+                                                />
+                                            )}
                                         </td>
                                     ))}
                                 </tr>
                             ),
                         )}
-                        {openNewRow && (
+                        {openNewRow ? (
                             <tr>
                                 <td>
-                                    <input type="text" placeholder="Type key" />
+                                    <input
+                                        type="text"
+                                        placeholder="Type key"
+                                        onBlur={e => this.addKey(e)}
+                                    />
                                 </td>
                                 {langs.map(lang => (
                                     <td key={lang}>
@@ -149,8 +217,8 @@ class DocumentPage extends Component {
                                     </td>
                                 ))}
                             </tr>
-                        )}
-                        {/* <tr>
+                        ) : (
+                            <tr>
                                 <td>
                                     <button
                                         onClick={e =>
@@ -160,7 +228,8 @@ class DocumentPage extends Component {
                                         +
                                     </button>
                                 </td>
-                            </tr> */}
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </Fragment>

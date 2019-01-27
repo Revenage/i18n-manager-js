@@ -8,8 +8,6 @@ function Navigation({
         logout,
     },
 }) {
-    console.log(username);
-
     return (
         <nav className="navbar navbar-expand-lg navbar-dark fixed-top bg-dark shadow">
             <NavLink
